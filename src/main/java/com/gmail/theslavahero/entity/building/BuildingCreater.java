@@ -9,12 +9,12 @@ public class BuildingCreater {
     public static final int MAX_FLOOR_BUILDING = 20;
     public static final int MIN_PASSENGERS_FLOOR = 0;
     public static final int MAX_PASSENGERS_FLOOR = 10;
-    public static Building building;
+
     private static int amountOfFloors;
 
     public static Building create() {
         Floor floor = new Floor();
-        building = new Building();
+        Building building = new Building();
         amountOfFloors = getRandomNumber(MIN_FLOOR_BUILDING, MAX_FLOOR_BUILDING);
         for (int currentFloorNumber = 1; currentFloorNumber <= amountOfFloors; currentFloorNumber++) {
             floor = getRandomFloor(currentFloorNumber);
@@ -24,7 +24,7 @@ public class BuildingCreater {
         return building;
     }
 
-    private static int getRandomNumber(int min, int max) {
+    public static int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max + 1 - min)) + min);
     }
 
@@ -37,7 +37,7 @@ public class BuildingCreater {
         return floor;
     }
 
-    private static Passenger getRandomPassenger(int currentFloor) {
+    public static Passenger getRandomPassenger(int currentFloor) {
         int desiredFloor = getRandomNumber(1, amountOfFloors);
         while (desiredFloor == currentFloor) {
             desiredFloor = getRandomNumber(1, amountOfFloors);

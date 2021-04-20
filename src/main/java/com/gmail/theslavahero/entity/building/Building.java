@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Building {
+
     private List<Floor> floors;
 
     public Building() {
@@ -20,7 +21,7 @@ public class Building {
         this.floors = floors;
     }
 
-    public void addFloor (Floor floor) {
+    public void addFloor(Floor floor) {
         floors.add(floor);
     }
 

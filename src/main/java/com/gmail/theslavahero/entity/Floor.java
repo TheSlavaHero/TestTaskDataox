@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Floor {
+
     private List<Passenger> passengers;
     private int number;
 

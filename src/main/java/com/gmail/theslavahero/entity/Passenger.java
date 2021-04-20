@@ -1,6 +1,7 @@
 package com.gmail.theslavahero.entity;
 
 public class Passenger {
+
     private int desiredFloor;
 
     public Passenger(int desiredFloor) {

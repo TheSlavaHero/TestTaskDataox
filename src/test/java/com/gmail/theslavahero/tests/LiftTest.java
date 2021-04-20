@@ -18,7 +18,7 @@ public class LiftTest extends AbstractLiftTest {
     public void liftTest() {
         System.out.println("LiftTest in class LiftTest");
         Assert.assertEquals(0, lift.getPassengersInLift().size());
-        lift.start();
+        lift.start(false);
         Assert.assertEquals(0, lift.getPassengersInLift().size());
 
         for (Floor floor : building.getFloors()) {
@@ -99,6 +99,12 @@ public class LiftTest extends AbstractLiftTest {
         lift.getPassengersFromFloorToLift();
         Assert.assertFalse(lift.getPassengersInLift().isEmpty());
 
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void currentFloorTest() {
+        lift.setCurrentFloor(0);
+        lift.setCurrentFloor(30);
     }
 
 }

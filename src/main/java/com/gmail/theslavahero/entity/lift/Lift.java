@@ -4,25 +4,37 @@ import com.gmail.theslavahero.entity.building.BuildingConsoleOutput;
 import com.gmail.theslavahero.entity.building.Building;
 import com.gmail.theslavahero.entity.Floor;
 import com.gmail.theslavahero.entity.Passenger;
+import com.gmail.theslavahero.entity.building.BuildingCreater;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.gmail.theslavahero.entity.building.BuildingCreater.getRandomNumber;
+import static com.gmail.theslavahero.entity.building.BuildingCreater.getRandomPassenger;
 
 public class Lift {
 
     public static final int MAX_CAPACITY = 5;
 
-    private List<Passenger> passengersInLift;
-    private Building building;
-    private int currentFloor;
-    private Direction direction;
-    private int lastFloorBeforeDecisingDirection;
+    private final Building building;
 
+    private List<Passenger> passengersInLift;
+    private Direction direction;
+    private int currentFloor;
+    private int lastFloorBeforeDecidingDirection;
 
     public Lift(Building building) {
         this.currentFloor = 1;
-        this.passengersInLift = new ArrayList<>(5);
+        this.passengersInLift = new ArrayList<>(MAX_CAPACITY);
         this.building = building;
+    }
+
+    public int getLastFloorBeforeDecidingDirection() {
+        return lastFloorBeforeDecidingDirection;
+    }
+
+    public void setLastFloorBeforeDecidingDirection(int lastFloorBeforeDecidingDirection) {
+        this.lastFloorBeforeDecidingDirection = lastFloorBeforeDecidingDirection;
     }
 
     public List<Passenger> getPassengersInLift() {
@@ -38,6 +50,9 @@ public class Lift {
     }
 
     public void setCurrentFloor(int currentFloor) {
+        if (currentFloor < 1 || currentFloor > building.getFloors().size()) {
+            throw new IllegalArgumentException("setCurrentFloor argument is invalid. Must be more than 0 and less than amount of the floors in the building.");
+        }
         this.currentFloor = currentFloor;
     }
 
@@ -49,18 +64,21 @@ public class Lift {
         this.direction = direction;
     }
 
-    public void start() {
+    public void start(boolean infinite) {
         direction = Direction.UP;
         for (;;)  {
-            dropPassengersFromLiftToFloor();
+
+            if (infinite) {
+                dropPassengersFromLiftToFloorInfinite();
+            } else dropPassengersFromLiftToFloor();
+
 
             if (passengersInLift.isEmpty()) {
                 decideDirection();
             }
-
             getPassengersFromFloorToLift();
+            calculateLastFloorBeforeDecidingDirection();
             BuildingConsoleOutput.print(building, this);
-
 
             boolean proceed = false;
             for (Floor floor : building.getFloors()) {
@@ -103,6 +121,28 @@ public class Lift {
 
     }
 
+    public void dropPassengersFromLiftToFloorInfinite() {//modified version of the above method to run code infinitely
+        List<Passenger> passengersToDeleteFromLift = new ArrayList<>();
+        for (Passenger passenger : passengersInLift) {
+            if (passenger.getDesiredFloor() == currentFloor) {
+                passengersToDeleteFromLift.add(passenger);
+                int buildingSize = building.getFloors().size();
+                for (;;) {
+                    int randomFloor = getRandomNumber(0, buildingSize - 1);
+                    Passenger randomPassenger = getRandomPassenger(currentFloor);
+                    if (building.getFloors().get(randomFloor).getPassengers().size() < 10 && randomPassenger.getDesiredFloor() != randomFloor + 1) {
+                        building.getFloors().get(randomFloor).addPassenger(randomPassenger);
+                        break;
+                    }
+                }
+            }
+        }
+        for (Passenger passenger : passengersToDeleteFromLift) {
+            passengersInLift.remove(passenger);
+        }
+
+    }
+
     public void getToNextFloor() {
         if (direction == Direction.UP) {
             currentFloor++;
@@ -127,6 +167,32 @@ public class Lift {
                 }
             }
         }  else direction = Direction.DOWN;
+    }
+
+    public void calculateLastFloorBeforeDecidingDirection() {
+
+        if(!passengersInLift.isEmpty()) {
+
+            if (direction.equals(Direction.DOWN)) {
+                int min = passengersInLift.get(0).getDesiredFloor();
+                for (Passenger passenger : passengersInLift) {
+                    if (passenger.getDesiredFloor() < min) {
+                        min = passenger.getDesiredFloor();
+                    }
+                }
+                lastFloorBeforeDecidingDirection = min;
+            } else if (direction.equals(Direction.UP)) {
+                int max = passengersInLift.get(0).getDesiredFloor();
+                for (Passenger passenger : passengersInLift) {
+                    if (passenger.getDesiredFloor() > max) {
+                        max = passenger.getDesiredFloor();
+                    }
+                }
+                lastFloorBeforeDecidingDirection = max;
+            }
+
+        }
+
     }
 
 }
